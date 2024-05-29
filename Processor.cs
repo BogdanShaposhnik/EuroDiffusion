@@ -14,13 +14,13 @@ namespace EuroDiffusion
         {
             Countries = countries;
             NumberOfCountries = countries.Count;
-            SetTowns();
+            SetCities();
         }
 
         private const int MaxSize = 10;
         List<Country> Countries = new List<Country>();
 
-        Town[,] Towns = new Town[MaxSize + 1, MaxSize + 1];
+        City[,] Cities = new City[MaxSize + 1, MaxSize + 1];
         int NumberOfCountries;
 
         public bool Run(int numberOfCase)
@@ -40,7 +40,7 @@ namespace EuroDiffusion
                 {
                     for (int y = 1; y < MaxSize + 1; y++)
                     {
-                        if (Towns[x, y] == null)
+                        if (Cities[x, y] == null)
                         {
                             continue;
                         }
@@ -54,7 +54,7 @@ namespace EuroDiffusion
 
                 BureaucraticIssuesInTheEvening(day);
                 day++;
-            } while (!EachTownHasAllMotifs());
+            } while (!EachCityHasAllMotifs());
 
             Countries = Countries.OrderBy(c => c.NumberOfDaysToComplete).ToList();
             Console.WriteLine("Case Number " + numberOfCase);
@@ -66,7 +66,7 @@ namespace EuroDiffusion
             return true;
         }
 
-        private bool SetTowns()
+        private bool SetCities()
         {
             foreach (var c in Countries)
             {
@@ -74,7 +74,7 @@ namespace EuroDiffusion
                 {
                     for (int y = c.YL; y <= c.YH; y++)
                     {
-                        Towns[x, y] = new Town(x, y, c, NumberOfCountries);
+                        Cities[x, y] = new City(x, y, c, NumberOfCountries);
                     }
                 }
             }
@@ -88,12 +88,12 @@ namespace EuroDiffusion
             {
                 for (int y = 1; y < MaxSize + 1; y++)
                 {
-                    if (Towns[x, y] == null)
+                    if (Cities[x, y] == null)
                     {
                         continue;
                     }
 
-                    Towns[x, y].AccumulateCoins();
+                    Cities[x, y].AccumulateCoins();
                     CheckIfDiffusionIsCompleted(x, y, day);
                 }
             }
@@ -101,16 +101,16 @@ namespace EuroDiffusion
 
         private void CheckIfDiffusionIsCompleted(int x, int y, int day)
         {
-            if (Towns[x, y] == null || Towns[x, y].DiffusionCompleted || !Towns[x, y].HasAllMotifs())
+            if (Cities[x, y] == null || Cities[x, y].DiffusionCompleted || !Cities[x, y].HasAllMotifs())
             {
                 return;
             }
 
-            if (Countries.Any(c => c.Name == Towns[x, y].Country.Name))
+            if (Countries.Any(c => c.Name == Cities[x, y].Country.Name))
             {
                 foreach (var country in Countries)
                 {
-                    if (country.Name == Towns[x, y].Country.Name)
+                    if (country.Name == Cities[x, y].Country.Name)
                     {
                         country.SetNumberOfDaysToComplete(day);
                         break;
@@ -119,35 +119,32 @@ namespace EuroDiffusion
             }
             else
             {
-                Countries.Add(Towns[x, y].Country);
+                Countries.Add(Cities[x, y].Country);
                 Countries.Last().SetNumberOfDaysToComplete(day);
             }
 
-            Towns[x, y].DiffusionCompleted = true;
+            Cities[x, y].DiffusionCompleted = true;
         }
 
         private bool SendRepresentativeCoins(int xFrom, int yFrom, int xTo, int yTo)
         {
-            if (Towns[xFrom, yFrom] != null && Towns[xTo, yTo] != null)
+            if (Cities[xFrom, yFrom] != null && Cities[xTo, yTo] != null)
             {
-                Towns[xTo, yTo].SetRepresentativeCoins(
-                    Towns[xFrom, yFrom].GetRepresentativeCoins());
+                Cities[xTo, yTo].SetRepresentativeCoins(
+                    Cities[xFrom, yFrom].GetRepresentativeCoins());
                 return true;
             }
 
             return false;
         }
 
-        private bool EachTownHasAllMotifs()
+        private bool EachCityHasAllMotifs()
         {
-            for (int x = 1; x < MaxSize + 1; x++)
+            foreach (City c in Cities)
             {
-                for (int y = 1; y < MaxSize + 1; y++)
+                if(c != null && !c.HasAllMotifs())
                 {
-                    if (Towns[x, y] != null && !Towns[x, y].HasAllMotifs())
-                    {
-                        return false;
-                    }
+                    return false;
                 }
             }
 

@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace EuroDiffusion
 {
-    class Town
+    class City
     {
-        public Town(int x, int y, Country country, int countOfMotifs)
+        private const int Motif = 1000000;
+
+        public City(int x, int y, Country country, int countOfMotifs)
         {
             X = x;
             Y = y;
@@ -21,7 +23,7 @@ namespace EuroDiffusion
                 Coins[i] = 0;
                 AccumulatedCoins[i] = 0;
             }
-            Coins[country.Motif] = 1000000;
+            Coins[country.Motif] = Motif;
 
             DiffusionCompleted = false;
         }
@@ -33,7 +35,7 @@ namespace EuroDiffusion
         public Country Country { get; private set; }
         public bool DiffusionCompleted { get; set; }
 
-        private int m_representativeValue = 1000;
+        private const int m_representativeValue = 1000;
 
         public bool HasAllMotifs()
         {
